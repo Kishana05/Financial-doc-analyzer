@@ -1,0 +1,42 @@
+# Virtual Environment
+venv/
+venv311/
+py311_bin/
+py311.zip
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Database
+analysis.db
+
+# Environment variables
+.env
+
+# Data
+data/financial_document_*.pdf
+outputs/
+
+# OS
+.DS_Store
+Thumbs.db
