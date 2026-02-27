@@ -12,6 +12,9 @@ import uuid
 import logging
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Depends, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 
@@ -37,6 +40,20 @@ app = FastAPI(
     version="2.0.0",
 )
 
+# ── CORS (allow browser requests from any origin during local development) ────
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ── Static files (React frontend) ─────────────────────────────────────────────
+_STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+if os.path.isdir(_STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=_STATIC_DIR), name="static")
+
 
 @app.on_event("startup")
 def on_startup():
@@ -45,8 +62,22 @@ def on_startup():
     logger.info("Database initialized successfully.")
 
 
+# ── Frontend (serve React app) ───────────────────────────────────────────────
+@app.get("/", include_in_schema=False)
+async def serve_frontend():
+    """Serve the React frontend."""
+    index_path = os.path.join(_STATIC_DIR, "index.html")
+    if os.path.isfile(index_path):
+        return FileResponse(index_path)
+    return {
+        "message": "Financial Document Analyzer API is running",
+        "version": "2.0.0",
+        "status": "healthy",
+        "note": "Frontend not found. Place static/index.html to enable the UI.",
+    }
+
 # ── Health check ──────────────────────────────────────────────────────────────
-@app.get("/", summary="Health Check")
+@app.get("/health", summary="Health Check")
 async def root():
     """Health check endpoint — verifies the API is running."""
     return {

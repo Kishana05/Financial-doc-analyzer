@@ -104,7 +104,8 @@ risk_assessment = Task(
 verification = Task(
     description=(
         "Verify that the uploaded file is a legitimate financial document. "
-        "Use the Financial Document Reader tool to inspect its content. "
+        "The document is located at this EXACT file path: {file_path}\n\n"
+        "Use the Financial Document Reader tool with path='{file_path}' to inspect its content. "
         "Check for the presence of standard financial report elements:\n"
         "- Company name, reporting period, and currency\n"
         "- At least one of: income statement, balance sheet, cash flow statement\n"

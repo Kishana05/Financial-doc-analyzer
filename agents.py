@@ -3,21 +3,17 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+# Bug Fix #6: was `from crewai.agents import Agent` (wrong sub-path)
 from crewai import Agent
-from crewai import LLM
 
 from tools import search_tool, FinancialDocumentTool
 
-### Loading LLM via Qwen DashScope OpenAI-compatible endpoint
-_model_name = os.getenv("LLM_MODEL", "qwen-plus")
-_api_base   = os.getenv("LLM_API_BASE", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1")
-_api_key    = os.getenv("DASHSCOPE_API_KEY", "")
-
-llm = LLM(
-    model=f"openai/{_model_name}",
-    api_base=_api_base,
-    api_key=_api_key,
-)
+### Loading LLM
+# Bug Fix #5: was `llm = llm` — NameError (self-referential undefined variable)
+# Using LiteLLM-compatible model string that CrewAI accepts.
+# Set OPENAI_API_KEY or GOOGLE_API_KEY in your .env file.
+_model_name = os.getenv("LLM_MODEL", "gemini/gemini-1.5-flash")
+llm = _model_name  # CrewAI also accepts a model-name string directly
 
 
 # Creating an Experienced Financial Analyst agent

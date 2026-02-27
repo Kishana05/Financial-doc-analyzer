@@ -44,26 +44,39 @@ def read_financial_document(path: str = 'data/sample.pdf') -> str:
     """Tool to read and extract text from a financial PDF document.
 
     Args:
-        path (str): Path to the PDF file. Defaults to 'data/sample.pdf'.
+        path (str): Path to the PDF file. Use the EXACT path provided in the task description.
 
     Returns:
         str: Full extracted text from the financial document.
     """
-    loader = PyPDFLoader(file_path=path)
-    docs = loader.load()
+    # Resolve to absolute path in case a relative path is given
+    if not os.path.isabs(path):
+        # Try relative to the current working directory
+        abs_path = os.path.abspath(path)
+    else:
+        abs_path = path
 
-    full_report = ""
-    for data in docs:
-        # Clean and format the financial document data
-        content = data.page_content
+    if not os.path.exists(abs_path):
+        return (
+            f"ERROR: File not found at '{abs_path}'. "
+            "Please use the EXACT file path provided in the task description. "
+            "Do not guess or invent paths."
+        )
 
-        # Remove extra whitespaces and format properly
-        while "\n\n" in content:
-            content = content.replace("\n\n", "\n")
+    try:
+        loader = PyPDFLoader(file_path=abs_path)
+        docs = loader.load()
 
-        full_report += content + "\n"
+        full_report = ""
+        for data in docs:
+            content = data.page_content
+            while "\n\n" in content:
+                content = content.replace("\n\n", "\n")
+            full_report += content + "\n"
 
-    return full_report or "No content could be extracted from the document."
+        return full_report or "No content could be extracted from the document."
+    except Exception as e:
+        return f"Error reading PDF: {e}"
 
 
 ## Expose via a class for backward-compatible imports used in agents/tasks
